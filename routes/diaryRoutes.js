@@ -10,6 +10,7 @@ import {
 } from "../controllers/diaryController.js";
 import { protectUser } from "../middlewares/authMiddleware.js";
 import { uploadDiaryFiles as upload } from "../middlewares/uploadMiddleware.js";
+import { optionalAuth} from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
@@ -40,7 +41,7 @@ router.post("/",
 router.get("/my", protectUser, getMyDiaries);
 
 // Public route to get a specific diary by ID (controller will check status)
-router.get("/:id", idParamValidation, getDiaryById);
+router.get("/:id", optionalAuth, idParamValidation, getDiaryById);
 
 router.put("/:id", 
     protectUser, 

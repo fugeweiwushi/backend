@@ -42,3 +42,19 @@ export const authorizeAdmin = (req, res, next) => {
   }
 };
 
+// Middleware to optionally authenticate user if token is provided
+export const optionalAuth = async (req, res, next) => {
+  let token;
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    try {
+      token = req.headers.authorization.split(' ')[1];
+      const decoded = jwt.verify(token, config.jwtSecret);
+      req.user = await User.findByPk(decoded.id, { attributes: { exclude: ['password'] } });
+      // If user not found for a valid token, req.user will be null.
+    } catch (error) {
+      console.warn('OptionalAuth: Token verification failed or user not found for token.', error.name); 
+      req.user = null; // Explicitly set to null on error or if user not found
+    }
+  }
+  next(); 
+};
