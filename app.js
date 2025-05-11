@@ -7,6 +7,7 @@ import config from "./config/index.js";
 import authRoutes from "./routes/authRoutes.js";
 import diaryRoutes from "./routes/diaryRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 // ES Module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -19,11 +20,15 @@ app.use(cors()); // Enable CORS for all routes
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
+// Serve static files from the "public" directory (e.g., for avatars)
+app.use(express.static(path.join(__dirname, "public")));
+
 // Serve static files from the "uploads" directory
 // This makes /uploads/images/* and /uploads/videos/* accessible
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // API Routes
+app.use("/api/users", userRoutes); // Add user routes
 app.use("/api/auth", authRoutes);
 app.use("/api/diaries", diaryRoutes);
 app.use("/api/admin", adminRoutes);
