@@ -74,14 +74,12 @@ export const approveDiaryAdmin = async (req, res) => {
   }
 };
 
-// @desc    Reject a diary
-// @route   PUT /api/admin/diaries/:id/reject
-// @access  Private (Admin/Reviewer)
 export const rejectDiaryAdmin = async (req, res) => {
-  const { reason } = req.body;
+  const { rejectReason } = req.body;
   const t = await sequelize.transaction();
 
-  if (!reason || typeof reason !== 'string' || reason.trim() === "") {
+  // 现在下面的校验会作用于正确的 `rejectReason` 变量
+  if (!rejectReason || typeof rejectReason !== 'string' || rejectReason.trim() === "") {
     return res.status(400).json({ message: "Rejection reason is required and must be a non-empty string" });
   }
 
@@ -97,14 +95,9 @@ export const rejectDiaryAdmin = async (req, res) => {
         await t.rollback();
         return res.status(400).json({ message: "Cannot reject an already approved diary." });
     }
-    // Optional: Check if already rejected with the same reason to avoid redundant updates
-    // if (diary.status === "rejected" && diary.rejectReason === reason.trim()) {
-    //   await t.rollback();
-    //   return res.status(400).json({ message: "Diary is already rejected with this reason" });
-    // }
 
     diary.status = "rejected";
-    diary.rejectReason = reason.trim();
+    diary.rejectReason = rejectReason.trim(); // 使用 trim 后的值
     await diary.save({ transaction: t });
     await t.commit();
 
